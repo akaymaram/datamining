@@ -2,7 +2,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-text = open("input.txt", "r")
+text = open("input3.txt", "r")
 #empty dictionary 
 d = {}
 
