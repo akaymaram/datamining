@@ -19,6 +19,6 @@ df = pd.DataFrame(te_ary, columns = te.columns_)
 from mlxtend.frequent_patterns import apriori
 freqItemSets =apriori(df, min_support = 0.65, use_colnames=True)
 print(freqItemSets.head(20))
-#cabn filter by length of itemsets as well
+#can filter by length of itemsets as well
 
 
