@@ -21,4 +21,3 @@ freqItemSets =apriori(df, min_support = 0.65, use_colnames=True)
 print(freqItemSets.head(20))
 #can filter by length of itemsets as well
 
-
