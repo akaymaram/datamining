@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 get_ipython().run_line_magic('pip', 'install frontend')
 get_ipython().run_line_magic('pip', 'install PyMuPDF')
 import fitz
@@ -24,18 +18,6 @@ from nltk.tokenize import word_tokenize
 
 from operator import itemgetter
 import json
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[2]:
@@ -298,9 +280,6 @@ def headers_para(doc, size_tag):
     return header_para
 
 
-# In[13]:
-
-
 # main.py 1.0.6
 
 ##list of logical words
@@ -323,47 +302,48 @@ print(content)
 print(colored('hello', 'red'), colored('world', 'green'))
 # sys.exit()
 
+
 font_counts, styles = fonts(doc, granularity=False)
 size_tag = font_tags(font_counts, styles)
+print(size_tag)
 elements = headers_para(doc, size_tag)
 
-paragraphs= ""
+paragraphs=""
 
 for elem in elements:
     if(len(elem)>=4 and elem[1]=='p'):
         paragraphs+=elem
-    
 
-print(colored('just the paragraphs', 'red'))
+
+print(colored('paragraphs extracted from the pdf', 'red'))
 print(paragraphs)
-print(colored("just the paragraphs", 'red'))
+print(colored("paragraphs extracted from the pdf", 'red'))
 
 
 ## removing stop words and Lemmatization
-stop_words=set([ 'a', 'about', 'above', 'after', 'again', 'against',
+stop_words=set(['<p>', '|' 'a', 'about', 'above', 'after', 'again', 'against',
 	'all', 'am', 'an', 'and', 'any', 'are',
 	'as', 'at', 'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by',
 	'could', 'did','do', 'does','doing','down', 'during', 'each', 'few', 'for', 'from', 'further', 'had','has','have','having', 'he', "he'd", "he'll", "he's", 'her', 'here', "here's", 'hers', 'herself', 'him', 'himself', 'his', 'how', "how's", 'i', "i'd", "i'll", "i'm", "i've", 'if', 'in', 'into', 'is',
 	 'it', "it's", 'its', 'itself', "let's",'me','more', 'most','my', 'myself','nor','of','on', 'once', 'only', 'or', 'other', 'ought', 'our', 'ours', 'ourselves', 'out', 'over', 'own','same','she', "she'd", "she'll", "she's", 'should',                                      'so', 'some', 'such',      'than', 'that',            "that's", 'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there', "there's", 'these', 'they', "they'd", "they'll", "they're", "they've", 'this', 'those', 'through', 'to', 'too', 'under', 'until', 'up',       'very', 'was',                   'we', "we'd", "we'll", "we're", "we've", 'were',                     'what', "what's", 'when', "when's", 'where', "where's", 'which', 'while', 'who', "who's", 'whom', 'why',         "why's", 'with',                 'would',                            'you', "you'd", "you'll", "you're", "you've", 'your', 'yours', 'yourself', 'yourselves'])
 
 ## still using word_tokens, due to differences in treatment of comma
-word_tokens = word_tokenize(content)
+word_tokens = word_tokenize(paragraphs)
 
 # lemmatizer so far only trims down "ing", "s", etc
 lemmatizer = WordNetLemmatizer()
 filtered_sentence = []
 for w in word_tokens:
 	if w.lower() not in stop_words:
-		filtered_sentence.append(lemmatizer.lemmatize(w)
+		filtered_sentence.append(lemmatizer.lemmatize(w))
 
 final_sentence= ' '.join(filtered_sentence)
-initial_list_of_sentences = [sentence for sentence in final_sentence.split(".") if len(sentence) > 0]
-                                 
+list_of_sentences = [sentence for sentence in final_sentence.split(".") if len(sentence) > 0]
+         
+print(colored('the list after stopwords', 'red'))
+print(list_of_sentences)
+print(colored("the list after stopwords", 'red'))
                                
-#the following extra information is already removed when we remove headers and footers and extract the paragraphs above. 
-#so this chunk of code is probably not needed anymore. 
-
-
 
 
 
@@ -452,7 +432,7 @@ best, score = ea.evolutionary_algorithm(summary_matrix, doc_length, summary_leng
 
 
 ## want stopwords here
-list_of_sentences_with_stopwords = [sentence for sentence in content.split(".") if len(sentence) > 0]
+list_of_sentences_with_stopwords = [sentence for sentence in paragraphs.split(".") if len(sentence) > 0]
 
 my_terms=[]
 
@@ -481,16 +461,3 @@ for x in my_terms:
 
 
 doc.save("output.pdf", garbage=4, deflate=True, clean=True)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
