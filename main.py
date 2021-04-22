@@ -1,20 +1,17 @@
-get_ipython().run_line_magic('pip', 'install frontend')
-get_ipython().run_line_magic('pip', 'install PyMuPDF')
+#import frontend
+#import PyMuPDF
 import fitz
 import numpy as np
 import sys
 import random
 import ea
-#import fitz
-get_ipython().run_line_magic('pip', 'install nltk')
 import nltk
 nltk.download('punkt')
 nltk.download('wordnet')
-get_ipython().run_line_magic('pip', 'install termcolor')
+import termcolor
 from termcolor import colored
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-
 
 from operator import itemgetter
 import json
@@ -343,6 +340,34 @@ list_of_sentences = [sentence for sentence in final_sentence.split(".") if len(s
 print(colored('the list after stopwords', 'red'))
 print(list_of_sentences)
 print(colored("the list after stopwords", 'red'))
+
+###################################################### FREQUENT ITEMSETS ####################################################################
+
+import pandas as pd
+from mlxtend.preprocessing import TransactionEncoder
+
+#text = open("input3.txt","r")
+text = list_of_sentences
+dataset = []
+for line in text:
+  line = line.strip()
+  line = line.lower()
+  #split line to words
+  words = line.split()
+  #add words to dataset array
+  dataset.append(words)
+
+# convert dataset array to Pandas dataframe
+te = TransactionEncoder()
+te_ary = te.fit(dataset).transform(dataset)
+df = pd.DataFrame(te_ary, columns = te.columns_)
+#apriori algo
+from mlxtend.frequent_patterns import apriori
+freqItemSets = apriori(df, min_support = 0.35, use_colnames=True)
+print(freqItemSets.head(20))
+print(colored("frequent itemsets are shown above", 'green'))
+
+############################################################## ENDS HERE #####################################################################
                                
 
 
