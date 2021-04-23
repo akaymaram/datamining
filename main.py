@@ -1,12 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-get_ipython().run_line_magic('pip', 'install frontend')
-get_ipython().run_line_magic('pip', 'install PyMuPDF')
-get_ipython().run_line_magic('pip', 'install mlxtend')
 import fitz
 import numpy as np
 import pandas as pd
@@ -14,23 +5,7 @@ from mlxtend.preprocessing import TransactionEncoder
 import sys
 import random
 import ea
-#import fitz
-get_ipython().run_line_magic('pip', 'install nltk')
-import nltk
-nltk.download('punkt')
-nltk.download('wordnet')
-get_ipython().run_line_magic('pip', 'install termcolor')
-from termcolor import colored
-from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
-
-
 from operator import itemgetter
-import json
-
-
-# In[2]:
-
 
 def fonts(doc, granularity=False):
 
@@ -104,8 +79,6 @@ def fonts(doc, granularity=False):
 
     return font_counts, styles
 
-
-# In[3]:
 
 
 def font_tags(font_counts, styles):
@@ -289,10 +262,6 @@ def headers_para(doc, size_tag):
     return header_para
 
 
-# In[20]:
-
-
-# main.py 1.0.6
 
 ##list of logical words
 # comparison = {'similarily', 'likewise', 'also', 'comparison'}
@@ -309,15 +278,9 @@ for page in doc:
 	text = page.get_text('text')
 	content += text
 
-#print(colored('hello', 'red'), colored('world', 'green'))
-#print(content)
-#print(colored('hello', 'red'), colored('world', 'green'))
-# sys.exit()
-
 
 font_counts, styles = fonts(doc, granularity=False)
 size_tag = font_tags(font_counts, styles)
-#print(size_tag)
 elements = headers_para(doc, size_tag)
 
 paragraphs=""
@@ -327,9 +290,6 @@ for elem in elements:
         paragraphs+=elem
 
 
-#print(colored('paragraphs extracted from the pdf', 'red'))
-#print(paragraphs)
-#print(colored("paragraphs extracted from the pdf", 'red'))
 
 
 ## removing stop words and Lemmatization
@@ -338,24 +298,8 @@ stop_words=set(['<','p', '>', '|', 'a', 'about', 'above', 'after', 'again', 'aga
 	'as', 'at', 'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by',
 	'could', 'did','do', 'does','doing','down', 'during', 'each', 'few', 'for', 'from', 'further', 'had','has','have','having', 'he', "he'd", "he'll", "he's", 'her', 'here', "here's", 'hers', 'herself', 'him', 'himself', 'his', 'how', "how's", 'i', "i'd", "i'll", "i'm", "i've", 'if', 'in', 'into', 'is',
 	 'it', "it's", 'its', 'itself', "let's",'me','more', 'most','my', 'myself','nor','of','on', 'once', 'only', 'or', 'other', 'ought', 'our', 'ours', 'ourselves', 'out', 'over', 'own','same','she', "she'd", "she'll", "she's", 'should', 'so', 'some', 'such', 'than', 'that', "that's", 'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there', "there's", 'these', 'they', "they'd", "they'll", "they're", "they've", 'this', 'those', 'through', 'to', 'too', 'under', 'until', 'up',       'very', 'was',                   'we', "we'd", "we'll", "we're", "we've", 'were',                     'what', "what's", 'when', "when's", 'where', "where's", 'which', 'while', 'who', "who's", 'whom', 'why',         "why's", 'with',                 'would',                            'you', "you'd", "you'll", "you're", "you've", 'your', 'yours', 'yourself', 'yourselves'])
-''''
-## still using word_tokens, due to differences in treatment of comma
-word_tokens = word_tokenize(paragraphs)
 
-# lemmatizer so far only trims down "ing", "s", etc
-lemmatizer = WordNetLemmatizer()
-filtered_sentence = []
-for w in word_tokens:
-	#if w.lower() not in stop_words:
-    filtered_sentence.append(lemmatizer.lemmatize(w))
 
-print(colored('filtered sentence', 'red'))
-print(filtered_sentence)
-print(colored('filtered sentence', 'red'))
-final_sentence= ' '.join(filtered_sentence)
-list_of_sentences = [sentence for sentence in final_sentence.split(".") if len(sentence) > 0]
-'''
-#stop_words=set(['<p>', '|'])
 list_of_sentences=[]
 
 for sent in paragraphs.split('.'):
@@ -374,12 +318,6 @@ for x in list_of_sentences:
         new_sent += " "
     list_of_sentences_with_stopwords.append(new_sent)
 
-print(colored('list of sent with stopwords removed', 'red'))
-print(list_of_sentences_with_stopwords)
-print(colored('list of sent with stopwords removed', 'red'))
-#print(colored('the list after stopwords', 'red'))
-#print(list_of_sentences)
-#print(colored("the list after stopwords", 'red'))
 
 
 ###################################################### FREQUENT ITEMSETS ####################################################################
@@ -408,7 +346,6 @@ for x in freqItemSets['itemsets']:
     for y in x:
         freq_items.add(y)
 #print(freqItemSets.head(20))
-print(colored("frequent itemsets are shown above", 'green'))
 
 ############################################################## ENDS HERE #####################################################################
     
@@ -453,7 +390,6 @@ def retrieved_matrix(summary):
 			count = len(set_of_commonalities)
 			for x in set_of_commonalities:
 				if x in freq_items: 
-					print("Im here")
 					count+=1
 			edge_weight = round(count / (sentence_size + second_sentence_size), 3)
 
@@ -505,10 +441,9 @@ selection_rate = .5
 
 
 best, score = ea.evolutionary_algorithm(summary_matrix, doc_length, summary_length, num_iterations, population_size, r_cross, mutation_coefficient, selection_rate)
+
 #print('Done!')
 #print('best summary: %s \ncohesion score: %f' % (best, score))
-
-
 ## want stopwords here
 #list_of_sentences_with_stopwords = [sentence for sentence in list_of_sentences if len(sentence) > 0]
 
@@ -520,13 +455,11 @@ for index in best:
 	my_terms.append(list_of_sentences[index])
 
 
-
 Adversative = ["however", "nevertheless", "in fact","actually", "instead", "contrary"]
 Sequential = ["then", "next", "last", "finally", "up to now", "to sum up"]
 Causal = ["therefore", "consequently", "then", "otherwise"]
 Additive = ["in addition","moreover", "that is", "for instance"
 "likewise","similarly"]
-
 
 for x in my_terms:
 	text = x
@@ -536,18 +469,7 @@ for x in my_terms:
 			highlight = page.addUnderlineAnnot(inst)
 
 
-
-
 doc.save("output.pdf", garbage=4, deflate=True, clean=True)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
 
 
 
