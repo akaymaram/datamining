@@ -61,21 +61,13 @@ def fonts(doc, granularity=False):
 
                             styles[identifier] = {'size': s['size'], 'font': s['font']}
 
-
-
                         font_counts[identifier] = font_counts.get(identifier, 0) + 1  # count the fonts usage
 
-
-
     font_counts = sorted(font_counts.items(), key=itemgetter(1), reverse=True)
-
-
 
     if len(font_counts) < 1:
 
         raise ValueError("Zero discriminating fonts found!")
-
-
 
     return font_counts, styles
 
@@ -85,8 +77,6 @@ def font_tags(font_counts, styles):
 
     """Returns dictionary with font sizes as keys and tags as value.
 
-
-
     :param font_counts: (font_size, count) for all fonts occuring in document
 
     :type font_counts: list
@@ -94,8 +84,6 @@ def font_tags(font_counts, styles):
     :param styles: all styles found in the document
 
     :type styles: dict
-
-
 
     :rtype: dict
 
@@ -107,8 +95,6 @@ def font_tags(font_counts, styles):
 
     p_size = p_style['size']  # get the paragraph's size
 
-
-
     # sorting the font sizes high to low, so that we can append the right integer to each tag
 
     font_sizes = []
@@ -118,8 +104,6 @@ def font_tags(font_counts, styles):
         font_sizes.append(float(font_size))
 
     font_sizes.sort(reverse=True)
-
-
 
     # aggregating the tags for each font size
 
@@ -144,8 +128,6 @@ def font_tags(font_counts, styles):
         elif size < p_size:
 
             size_tag[size] = '<s{0}>'.format(idx)
-
-
 
     return size_tag
 
@@ -191,11 +173,7 @@ def headers_para(doc, size_tag):
 
             if b['type'] == 0:  # this block contains text
 
-
-
                 # REMEMBER: multiple fonts and sizes are possible IN one block
-
-
 
                 block_string = ""  # text found in block
 
@@ -235,44 +213,50 @@ def headers_para(doc, size_tag):
 
                                         block_string += " " + s['text']
 
-
-
                                 else:
 
                                     header_para.append(block_string)
 
                                     block_string = size_tag[s['size']] + s['text']
 
-
-
                                 previous_s = s
-
-
 
                     # new block started, indicating with a pipe
 
                     block_string += "|"
 
-
-
                 header_para.append(block_string)
-
-
 
     return header_para
 
 
 
 ##list of logical words
-# comparison = {'similarily', 'likewise', 'also', 'comparison'}
-# reason = {'cause', 'reason'}
-# result = {'result', 'consequence', 'therefore', 'thus','consequently', 'hence'}
-# contrast = {'however', 'on the other hand', 'on the contrary', 'contrast'}
-# sequential = {'Firstly', 'secondly', 'thirdly', 'next','last', 'finally', 'in addition', 'furthermore', 'also','before', }
-# order_of_importance = {'most', 'more', 'importantly', 'significantly','above', 'all', 'primarily', 'essential'}
+comparison = {'similarily', 'likewise', 'also', 'comparison'}
+reason = {'cause', 'reason'}
+result = {'result', 'consequence', 'therefore', 'thus','consequently', 'hence'}
+contrast = {'however', 'on the other hand', 'on the contrary', 'contrast'}
+sequential = {'Firstly', 'secondly', 'thirdly', 'next','last', 'finally', 'in addition', 'furthermore', 'also','before', }
+order_of_importance = {'most', 'more', 'importantly', 'significantly','above', 'all', 'primarily', 'essential'}
+Adversative = ["however", "nevertheless", "in fact","actually", "instead", "contrary"]
+Sequential = ["then", "next", "last", "finally", "up to now", "to sum up"]
+Causal = ["therefore", "consequently", "then", "otherwise", "because"]
+Additive = ["in addition","moreover", "that is", "for instance"
+"likewise","similarly"]
 
+lst = [comparison,reason, result, contrast, sequential, order_of_importance, Adversative, Sequential, Causal, Additive]
+union_set = set().union(*lst)
 
-doc = fitz.open("pdf_full.pdf")
+while True:
+    filename = input("Please Enter Name of the File : \n")
+    # pdf_full.pdf
+    try:
+        doc = fitz.open(filename)
+    except Exception:
+        print('File Not Found, Please Try Again')
+    else:
+        break
+
 content = ""
 for page in doc:
 	text = page.get_text('text')
@@ -288,9 +272,6 @@ paragraphs=""
 for elem in elements:
     if(len(elem)>=4 and elem[1]=='p'):
         paragraphs+=elem
-
-
-
 
 ## removing stop words and Lemmatization
 stop_words=set(['<','p', '>', '|', 'a', 'about', 'above', 'after', 'again', 'against',
@@ -318,12 +299,8 @@ for x in list_of_sentences:
         new_sent += " "
     list_of_sentences_with_stopwords.append(new_sent)
 
-
-
 ###################################################### FREQUENT ITEMSETS ####################################################################
 
-
-#text = open("input3.txt","r")
 text = list_of_sentences_with_stopwords
 dataset = []
 for line in text:
@@ -345,11 +322,8 @@ freq_items = set()
 for x in freqItemSets['itemsets']:
     for y in x:
         freq_items.add(y)
-#print(freqItemSets.head(20))
 
 ############################################################## ENDS HERE #####################################################################
-    
-    
 
 
 def retrieved_matrix(summary):
@@ -383,24 +357,25 @@ def retrieved_matrix(summary):
 			##not count stopwords
 			#count = len(set_of_words.intersection(second_set_of_words))
 			#edge_weight = round(count / (sentence_size + second_sentence_size), 3)
-            
-            
-            
-			set_of_commonalities = set_of_words.intersection(second_set_of_words)
-			count = len(set_of_commonalities)
-			for x in set_of_commonalities:
-				if x in freq_items: 
-					count+=1
-			edge_weight = round(count / (sentence_size + second_sentence_size), 3)
 
+			set_of_commonalities = set_of_words.intersection(second_set_of_words)
+
+
+        
+			count = len(set_of_commonalities)
+
+
+			# for x in set_of_commonalities:
+			# 	if x in freq_items: 
+			# 		count+=1
+
+
+			edge_weight = round(count / (sentence_size + second_sentence_size), 3)
 			row.append(edge_weight)
 		## adds a row to matrix (row by row)
 		matrix = np.vstack([matrix, row])
 
 	return matrix
-
-
-
 
 
 ## calculates table for whole document
@@ -424,49 +399,50 @@ def summary_matrix(summary):
 		matrix = np.vstack([matrix, row])
 	return matrix
 
-print(summary_matrix([8,17,19,21,23]))
 doc_length = len(max_matrix)-1
 
-summary_length = 5
-
+summary_length = int(input("Please Enter Summary Length: \n"))
 num_iterations = 100
-
 population_size = 10
-
 r_cross = 0.9
-
 mutation_coefficient = .1
-
 selection_rate = .5
 
 
 best, score = ea.evolutionary_algorithm(summary_matrix, doc_length, summary_length, num_iterations, population_size, r_cross, mutation_coefficient, selection_rate)
 
-#print('Done!')
-#print('best summary: %s \ncohesion score: %f' % (best, score))
-## want stopwords here
-#list_of_sentences_with_stopwords = [sentence for sentence in list_of_sentences if len(sentence) > 0]
-
 my_terms=[]
 
 for index in best:
-	print('['+str(index)+'] ', end='')
-	print(list_of_sentences[index], end='.')
-	my_terms.append(list_of_sentences[index])
+    my_terms.append(list_of_sentences[index])
+    ## Keep This
+    # print('[' + str(index) + '] ', end='')
+    # print(list_of_sentences[index], end='.')
 
 
-Adversative = ["however", "nevertheless", "in fact","actually", "instead", "contrary"]
-Sequential = ["then", "next", "last", "finally", "up to now", "to sum up"]
-Causal = ["therefore", "consequently", "then", "otherwise"]
-Additive = ["in addition","moreover", "that is", "for instance"
-"likewise","similarly"]
+my_terms = [w.replace('- ', '') for w in my_terms]
+my_terms = [w.replace('  ', ' ') for w in my_terms]
+
+print()
+print(str(summary_length) + " sentences summary: ")
+for i in range(len(my_terms)):
+    print(my_terms[i] + '.')
 
 for x in my_terms:
 	text = x
 	for page in doc:
 		text_instances = page.searchFor(text)
 		for inst in text_instances:
-			highlight = page.addUnderlineAnnot(inst)
+                 highlight = page.addHighlightAnnot(inst)
+
+
+for x in union_set:
+    text = " " + x + " "
+    for page in doc:
+        text_instances = page.searchFor(text)
+        for inst in text_instances:
+            highlight = page.addUnderlineAnnot(inst)
+
 
 
 doc.save("output.pdf", garbage=4, deflate=True, clean=True)

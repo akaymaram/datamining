@@ -72,7 +72,7 @@ def evolutionary_algorithm(summary_matrix, doc_length, summary_length, number_of
 		for i in range(population_size):
 			if scores[i] > best_score:
 				best_summary, best_score = population[i], scores[i]
-				print(">%d, new best f(%s) = %f" % (gen,  best_summary, best_score))
+				#print(">%d, new best f(%s) = %f" % (gen,  best_summary, best_score))
 
 
 		selected = []
