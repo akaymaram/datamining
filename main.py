@@ -247,9 +247,15 @@ Additive = ["in addition","moreover", "that is", "for instance"
 lst = [comparison,reason, result, contrast, sequential, order_of_importance, Adversative, Sequential, Causal, Additive]
 union_set = set().union(*lst)
 
+#print(sys.argv[1])
+#print(sys.argv[1])
+
+
+
 while True:
-    filename = input("Please Enter Name of the File : \n")
+    #filename = input("Please Enter Name of the File : \n")
     # pdf_full.pdf
+    filename = sys.argv[1]
     try:
         doc = fitz.open(filename)
     except Exception:
@@ -359,17 +365,10 @@ def retrieved_matrix(summary):
 			#edge_weight = round(count / (sentence_size + second_sentence_size), 3)
 
 			set_of_commonalities = set_of_words.intersection(second_set_of_words)
-
-
-        
 			count = len(set_of_commonalities)
-
-
-			# for x in set_of_commonalities:
-			# 	if x in freq_items: 
-			# 		count+=1
-
-
+			for x in set_of_commonalities:
+				if x in freq_items: 
+					count+=1
 			edge_weight = round(count / (sentence_size + second_sentence_size), 3)
 			row.append(edge_weight)
 		## adds a row to matrix (row by row)
@@ -401,7 +400,8 @@ def summary_matrix(summary):
 
 doc_length = len(max_matrix)-1
 
-summary_length = int(input("Please Enter Summary Length: \n"))
+#summary_length = int(input("Please Enter Summary Length: \n"))
+summary_length = int(sys.argv[2])
 num_iterations = 100
 population_size = 10
 r_cross = 0.9
@@ -436,12 +436,12 @@ for x in my_terms:
                  highlight = page.addHighlightAnnot(inst)
 
 
-for x in union_set:
-    text = " " + x + " "
-    for page in doc:
-        text_instances = page.searchFor(text)
-        for inst in text_instances:
-            highlight = page.addUnderlineAnnot(inst)
+# for x in union_set:
+#     text = " " + x + " "
+#     for page in doc:
+#         text_instances = page.searchFor(text)
+#         for inst in text_instances:
+#             highlight = page.addUnderlineAnnot(inst)
 
 
 
