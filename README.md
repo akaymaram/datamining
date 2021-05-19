@@ -1,4 +1,4 @@
-Download the repo, install required packages (including mlxtend and PyMuPDF (fitz) 1.18.9), and run "python3 main.py" from the project's root directory with the following command line arguments.
+Download the repo, install required packages (pandas, numpy, mlxtend, and PyMuPDF (fitz) version 1.18.9), and run "python3 main.py" from the project's root directory with the following command line arguments.
 1. name/path to the input pdf file
 2. length (number of sentences) of the summary
 
