@@ -1,4 +1,9 @@
-For running, download the repo, install required packages (including mlxtend and PyMuPDF (fitz) 1.18.9), and run "python3 main.py sample_input.pdf summary_length" from the project's root directory
+Download the repo, install required packages (including mlxtend and PyMuPDF (fitz) 1.18.9), and run "python3 main.py" from the project's root directory with the following command line arguments.
+1. name/path to the input pdf file
+2. length (number of sentences) of the summary
+
+Example command:
+python3 main.py sample_input.pdf 10
 
 
 # text summarization
