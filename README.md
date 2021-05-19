@@ -1,9 +1,9 @@
 For running, download the repo as a zipped folder, install required packages (including mlxtend and PyMuPDF (fitz) 1.18.9), and run "python3 main.py" from the project's root directory
 
 
-# datamining
+# text summarization
 
-possible datasets:
+other datasets:
 
 https://duc.nist.gov
 
