@@ -1,3 +1,4 @@
+
 import fitz
 import numpy as np
 import pandas as pd
@@ -6,6 +7,49 @@ import sys
 import random
 import ea
 from operator import itemgetter
+
+import multiprocessing
+import threading
+import time
+
+
+styles = {}
+
+font_counts = {}
+
+
+def fonts_optimized(page,granularity=False):
+        blocks = page.getText("dict")["blocks"]
+
+        for b in blocks:  # iterate through the text blocks
+
+            if b['type'] == 0:  # block contains text
+
+                for l in b["lines"]:  # iterate through the text lines
+
+                    for s in l["spans"]:  # iterate through the text spans
+
+                        if granularity:
+
+                            identifier = "{0}_{1}_{2}_{3}".format(s['size'], s['flags'], s['font'], s['color'])
+
+                            styles[identifier] = {'size': s['size'], 'flags': s['flags'], 'font': s['font'],
+
+                                                  'color': s['color']}
+
+                        else:
+
+                            identifier = "{0}".format(s['size'])
+
+                            styles[identifier] = {'size': s['size'], 'font': s['font']}
+
+                        font_counts[identifier] = font_counts.get(identifier, 0) + 1  # count the fonts usage
+
+
+
+
+
+
 
 def fonts(doc, granularity=False):
 
@@ -132,9 +176,6 @@ def font_tags(font_counts, styles):
     return size_tag
 
 
-# In[4]:
-
-
 def headers_para(doc, size_tag):
 
     """Scrapes headers & paragraphs from PDF and return texts with element tags.
@@ -171,6 +212,7 @@ def headers_para(doc, size_tag):
 
         for b in blocks:  # iterate through the text blocks
 
+
             if b['type'] == 0:  # this block contains text
 
                 # REMEMBER: multiple fonts and sizes are possible IN one block
@@ -180,6 +222,7 @@ def headers_para(doc, size_tag):
                 for l in b["lines"]:  # iterate through the text lines
 
                     for s in l["spans"]:  # iterate through the text spans
+
 
                         if s['text'].strip():  # removing whitespaces:
 
@@ -247,11 +290,6 @@ Additive = ["in addition","moreover", "that is", "for instance"
 lst = [comparison,reason, result, contrast, sequential, order_of_importance, Adversative, Sequential, Causal, Additive]
 union_set = set().union(*lst)
 
-#print(sys.argv[1])
-#print(sys.argv[1])
-
-
-
 while True:
     #filename = input("Please Enter Name of the File : \n")
     # pdf_full.pdf
@@ -263,18 +301,34 @@ while True:
     else:
         break
 
+
+
+# pool = multiprocessing.Pool()
+
+# inputs = [page for page in doc]
+
+
+# pool.map(fonts_optimized, inputs)
+#TypeError: cannot pickle 'SwigPyObject' object
+
+font_counts = sorted(font_counts.items(), key=itemgetter(1), reverse=True)
+
+# if len(font_counts) < 1:
+#     raise ValueError("Zero discriminating fonts found!")
+
+
 content = ""
 for page in doc:
 	text = page.get_text('text')
 	content += text
 
-
 font_counts, styles = fonts(doc, granularity=False)
 size_tag = font_tags(font_counts, styles)
+
 elements = headers_para(doc, size_tag)
 
-paragraphs=""
 
+paragraphs=""
 for elem in elements:
     if(len(elem)>=4 and elem[1]=='p'):
         paragraphs+=elem
@@ -288,6 +342,7 @@ stop_words=set(['<','p', '>', '|', 'a', 'about', 'above', 'after', 'again', 'aga
 
 
 list_of_sentences=[]
+
 
 for sent in paragraphs.split('.'):
     if(len(sent)>4):
@@ -304,6 +359,7 @@ for x in list_of_sentences:
         new_sent += y
         new_sent += " "
     list_of_sentences_with_stopwords.append(new_sent)
+
 
 ###################################################### FREQUENT ITEMSETS ####################################################################
 
@@ -330,7 +386,6 @@ for x in freqItemSets['itemsets']:
         freq_items.add(y)
 
 ############################################################## ENDS HERE #####################################################################
-
 
 def retrieved_matrix(summary):
 
@@ -408,22 +463,51 @@ r_cross = 0.9
 mutation_coefficient = .1
 selection_rate = .5
 
+total_bests_scores = []
 
-best, score = ea.evolutionary_algorithm(summary_matrix, doc_length, summary_length, num_iterations, population_size, r_cross, mutation_coefficient, selection_rate)
+
+threads = []
+for n in range(16):
+    t = threading.Thread(target=ea.evolutionary_algorithm, args=(summary_matrix, doc_length, summary_length, num_iterations, population_size, r_cross, mutation_coefficient, selection_rate,total_bests_scores))
+    t.start()
+    threads.append(t)
+
+for t in threads:
+    t.join()
+
+# t1 = threading.Thread(target=ea.evolutionary_algorithm, args=(summary_matrix, doc_length, summary_length, num_iterations, population_size, r_cross, mutation_coefficient, selection_rate,total_bests_scores))
+# t1.start()
+# t1.join()
+
+best, score = total_bests_scores[0]
+# best, score = ea.evolutionary_algorithm(summary_matrix, doc_length, summary_length, num_iterations, population_size, r_cross, mutation_coefficient, selection_rate)
+
+top_sentences = {}
+# for x in total_bests_scores:
+#     print(x)
+
+for x in total_bests_scores:
+    for y in x[0]:
+        if y in top_sentences:
+            top_sentences[y]+=1
+        else:
+            top_sentences[y] =1
+
+sorted_top_sentences = dict(sorted(top_sentences.items(), key=itemgetter(1),reverse=True))
+x = list(sorted_top_sentences.items())
+
+best = [y[0] for y in x[:summary_length]]
+
 
 my_terms=[]
 
 for index in best:
     my_terms.append(list_of_sentences[index])
-    ## Keep This
-    # print('[' + str(index) + '] ', end='')
-    # print(list_of_sentences[index], end='.')
 
 
 my_terms = [w.replace('- ', '') for w in my_terms]
 my_terms = [w.replace('  ', ' ') for w in my_terms]
 
-print()
 print(str(summary_length) + " sentences summary: ")
 for i in range(len(my_terms)):
     print(my_terms[i] + '.')
@@ -444,8 +528,8 @@ for x in my_terms:
 #             highlight = page.addUnderlineAnnot(inst)
 
 
-
 doc.save("output.pdf", garbage=4, deflate=True, clean=True)
+
 
 
 
