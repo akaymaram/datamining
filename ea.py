@@ -1,20 +1,13 @@
-# ea.py 1.0.5
-
 import numpy as np
 import random
-
 
 def fitness_function(summary, summary_matrix):
 	total = 0
 	matrix = summary_matrix(summary)
 	matrix = matrix[1:]
 	for row in matrix:
-			total+=np.sum(row[1:])
-
+		total+=np.sum(row[1:])
 	return total
-
- 
-
  
 def mutation(summary, r_mut, doc_length, summary_matrix):
 	num_sentences_to_change = max(int(r_mut*len(summary)),1)
@@ -37,20 +30,15 @@ def mutation(summary, r_mut, doc_length, summary_matrix):
 	for tup in sentenceID_sum_tuple:
 		mutated_summary.remove(tup[0])
 
-
 	while len(mutated_summary) < len(summary):
 		sample_index = random.randint(0, doc_length-1)
 		if sample_index not in mutated_summary:
-			mutated_summary.append(sample_index) 
-
+			mutated_summary.append(sample_index)
 
 	return sorted(mutated_summary)
 
+def evolutionary_algorithm(summary_matrix, doc_length, summary_length, number_of_iterations, population_size, r_cross, mutation_coefficient, selection_rate,total_bests_scores = []):
 
-
-def evolutionary_algorithm(summary_matrix, doc_length, summary_length, number_of_iterations, population_size, r_cross, mutation_coefficient, selection_rate):
-
-	
 	population = []
 
 	for _ in range(population_size):
@@ -94,6 +82,7 @@ def evolutionary_algorithm(summary_matrix, doc_length, summary_length, number_of
 		
 		
 		population = children
-	return [best_summary, best_score]
+	total_bests_scores.append((best_summary, best_score))
+	return best_summary,best_score
 
 
